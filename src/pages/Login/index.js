@@ -4,7 +4,8 @@ import { Container, Row, Col, Form } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import { showToast } from "../../helpers";
-import { message } from "antd";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,7 +13,8 @@ const Login = () => {
     email: "",
     password: "",
   });
-
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const handleInput = (event) => {
     const value = event.target.value;
     const name = event.target.name;
@@ -31,13 +33,14 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-      console.log("response", response);
       const data = await response.json();
       if (response.status !== 200) {
-        console.log(data);
+        setError(data.error);
+        setMessage(data.message);
+        toast.warning(data.message, {});
       }
     } catch (error) {
-      console.log(error.password);
+      console.log("errror", error);
     }
   };
 
@@ -54,13 +57,16 @@ const Login = () => {
             <Card.Header className="text-center">Login Form</Card.Header>
             <Card.Body>
               <Card.Text>
+                {message}
                 <Form.Group className="mb-3">
                   <Form.Label>Email address</Form.Label>
                   <Form.Control type="email" placeholder="Enter Email" value={input.email} name="email" onChange={handleInput}></Form.Control>
+                  {error.email && <Form.Text className="text-danger">{error.email}</Form.Text>}
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Password</Form.Label>
                   <Form.Control type="password" value={input.password} placeholder="Enter Password" onChange={handleInput} name="password"></Form.Control>
+                  {error.password && <Form.Text className="text-danger">{error.password}</Form.Text>}
                 </Form.Group>
               </Card.Text>
               <Button variant="primary" onClick={handleLogin}>
